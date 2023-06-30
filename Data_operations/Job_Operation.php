@@ -11,9 +11,9 @@ class Job{
         $this->con = $db->connect();        
     }
 
-public function postjob($title, $description, $empType, $education, $experience, $industry, $category, $name, $email,$deadline){
-  $stmt = $this->con->prepare("INSERT INTO jobs (j_title, j_description, j_empType, j_education, j_experience, j_industry, j_category,j_name, j_email,deadline) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-  $stmt->bind_param("ssssssssss", $title, $description, $empType, $education, $experience, $industry, $category, $name, $email,$deadline);
+public function postjob($title, $description, $empType, $education, $experience, $industry, $category, $name, $email,$deadline,$salary,$vacancies){
+  $stmt = $this->con->prepare("INSERT INTO jobs (j_title, j_description, j_empType, j_education, j_experience, j_industry, j_category,j_name, j_email,deadline,j_salary,vacancies) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)");
+  $stmt->bind_param("ssssssssssss", $title, $description, $empType, $education, $experience, $industry, $category, $name, $email,$deadline,$salary,$vacancies);
   if ($stmt->execute()) {
     return 1;
 } else {
@@ -51,15 +51,27 @@ public function postjob($title, $description, $empType, $education, $experience,
     return $stmt->affected_rows > 0;
 }
 
-public function update_job($jobId,$title,$description,$empType,$education,$experience,$industry,$category){
-      $stmt = $this->con->prepare("UPDATE jobs SET j_title = ?, j_description = ?, j_empType = ?, j_education = ?, j_experience = ?, j_industry = ?, j_category = ? WHERE j_id = ?");
+public function update_job($jobId,$title,$description,$empType,$education,$experience,$industry,$category,$vacancies,$salary){
+      $stmt = $this->con->prepare("UPDATE jobs SET j_title = ?, j_description = ?, j_empType = ?, j_education = ?, j_experience = ?, j_industry = ?, j_category = ? ,j_salary=?,vacancies=? WHERE j_id = ?");
      
-      $stmt->bind_param("ssssssss", $title, $description, $empType, $education, $experience, $industry, $category,$jobId);
+      $stmt->bind_param("ssssssssss", $title, $description, $empType, $education, $experience, $industry, $category,$salary,$vacancies,$jobId);
       if ($stmt->execute()) {
         return true;
     } else {
         return false;
     }
+
+}
+
+public function allJobs(){
+  $stmt=$this->con->prepare("SELECT * FROM jobs  ORDER BY j_id DESC");
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $jobs = array();
+  while ($row = $result->fetch_assoc()){
+    $jobs[] = $row;
+  }
+  return $jobs;
 
 }
 

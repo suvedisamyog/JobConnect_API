@@ -16,9 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
     $deadline = trim($_POST['deadline']);
+    $salary = trim($_POST['salary']);
+    $vacancies=trim($_POST["vacancies"]);
 
 
-    if (!empty($title) && !empty($description) && !empty($empType) && !empty($education) && !empty($experience) && !empty($industry) && !empty($category) && !empty($name) && !empty($email) && !empty($deadline)){
+
+    if (!empty($title) && !empty($description) && !empty($empType) && !empty($education) && !empty($experience) && !empty($industry) && !empty($category) && !empty($name) && !empty($email) && !empty($deadline) && !empty($salary) && !empty($vacancies)){
 
         $currentTimestamp = date('Y-m-d H:i:s'); 
 
@@ -37,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
    
         $job = new Job();
-        $result=$job->postjob($title, $description, $empType, $education, $experience, $industry, $category, $name, $email,$deadlineTimestamp);
+        $result=$job->postjob($title, $description, $empType, $education, $experience, $industry, $category, $name, $email,$deadlineTimestamp,$salary,$vacancies);
 
         if($result==1){
             $response['error'] = false;

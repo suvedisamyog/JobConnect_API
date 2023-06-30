@@ -9,12 +9,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     $oPhone = isset($_POST['oPhone']) ? $_POST['oPhone'] : '';   
     $oImg = isset($_POST['oImg']) ? $_POST['oImg'] : '';
     $oWeb = isset($_POST['oWeb']) ? $_POST['oWeb'] : '';
+    $oLocation = isset($_POST['oLocation']) ? $_POST['oLocation'] : '';
 
-    if(!empty($oName) && !empty($oEmail) && !empty($oPhone) && !empty($oImg) && !empty($oImg)){
+    if(!empty($oName) && !empty($oEmail) && !empty($oPhone) && !empty($oImg) && !empty($oImg) && !empty($oLocation)){
         $pathImg='../Images/'. date("d-m-y") . '-' . time() . '-' . rand(10000,1000000) . '.jpeg';
         if(file_put_contents($pathImg,base64_decode($oImg))){
             $db=new Org();
-            $orgprofile = $db->orgprofile($oName, $oEmail,$oPhone, $pathImg,$oWeb );
+            $orgprofile = $db->orgprofile($oName, $oEmail,$oPhone, $pathImg,$oWeb ,$oLocation);
             if ($orgprofile == 1) {
                 $update_reg_complete=$db->update_reg_complete($oEmail);
                   if($update_reg_complete==1){
