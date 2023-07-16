@@ -62,6 +62,7 @@ class Org{
         $stmt->bind_param("ssssss", $oName,$oPhone,$oWeb,$oImg,$oLocation,$oEmail);
         if ($stmt->execute() &&  $this->changeName($oName,$oEmail)) {
                return true;
+               
         } else {
             return false;
         }

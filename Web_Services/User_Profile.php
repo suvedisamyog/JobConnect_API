@@ -21,11 +21,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!empty($uName) && !empty($uEmail) && !empty($uDob) && !empty($uEducation) && !empty($uImg) && !empty($uCategories) && !empty($uBio) && !empty($uCv) && !empty($uPhone)) {
         $pathImg='../Images/'. date("d-m-y") . '-' . time() . '-' . rand(10000,1000000) . '.jpeg';
-        $pathPdf='../Pdf/'. date("d-m-y") . '-' . time() . '-' . rand(10000,1000000) . '.pdf';
+      
 
-        if((file_put_contents($pathImg,base64_decode($uImg))) && file_put_contents($pathPdf,base64_decode($uCv))){
+        if((file_put_contents($pathImg,base64_decode($uImg)))){
             $db = new User();
-            $userProfile = $db->userProfile($uName, $uEmail, $uDob,$uPhone, $uEducation,$uBio, $pathImg,$pathPdf, $uCategories);
+            $userProfile = $db->userProfile($uName, $uEmail, $uDob,$uPhone, $uEducation,$uBio, $pathImg,$uCv, $uCategories);
     
             if ($userProfile == 1) {
                 $update_reg_complete=$db->update_reg_complete($uEmail);
