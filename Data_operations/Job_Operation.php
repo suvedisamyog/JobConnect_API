@@ -107,6 +107,25 @@ public function allJobs(){
 
 }
 
+public function suggestedJobs($categoryName){
+  $stmt=$this->con->prepare("SELECT * FROM jobs WHERE j_category=? ORDER BY j_id DESC");
+  $stmt->bind_param("s", $categoryName);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  if ($result->num_rows > 0) {
+   $jobs = array();
+  while ($row = $result->fetch_assoc()){
+    if ($row['deadline'] >  $this->currentDateTime) {
+      $jobs[] = $row;
+  }  }
+  return $jobs;
+} else {
+  
+    return false;
+}
+  
+} 
+
 
 
 public function getAllSavedJobs($email){
@@ -205,18 +224,51 @@ public function checkApplied($Email, $jobId) {
     return array('status' => null, 'exists' => false);
   }
 }
-public function applyJob($Email, $jobId) {
+public function applyJob($Email, $jobId,$Name) {
   $status = "Pending"; 
   
-  $stmt = $this->con->prepare("INSERT INTO applied_jobs (Job_id, Applied_By, Status) VALUES (?, ?, ?)");
-  $stmt->bind_param("sss", $jobId, $Email, $status); 
+  $stmt = $this->con->prepare("INSERT INTO applied_jobs (Job_id, Applied_By, Name, Status) VALUES (?, ?, ?, ?)");
+  $stmt->bind_param("ssss", $jobId, $Email,$Name,$status); 
   
   if ($stmt->execute()) {
+    $this->appliedHistory($Email, $jobId);
       return true;
   } else {
       return "Error while adding"; 
   } 
 }
+
+public function appliedHistory($Email,$jobId){
+  $stmt=$this->con->prepare("SELECT j_category  FROM jobs WHERE j_id =? ");
+  $stmt->bind_param("i",$jobId);
+  $stmt->execute();
+  $result = $stmt->get_result();
+ if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $category = $row['j_category'];
+
+        $stmt = $this->con->prepare("SELECT * FROM applied_history WHERE user = ? AND job_category = ?");
+        $stmt->bind_param("ss", $Email, $category);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+         
+          $stmt = $this->con->prepare("UPDATE applied_history SET countTimes = countTimes + 1 WHERE user = ? AND job_category = ?");
+          $stmt->bind_param("ss", $Email, $category);
+          $stmt->execute();
+      } else {
+          
+          $stmt = $this->con->prepare("INSERT INTO applied_history (user, job_category, countTimes) VALUES (?, ?, 1)");
+          $stmt->bind_param("ss", $Email, $category);
+          $stmt->execute();
+      }
+
+    }
+   
+}
+
+
 
 public function getAllAppliedJobs($email){
   $stmt=$this->con->prepare("SELECT * FROM applied_jobs WHERE Applied_By=? ORDER BY applied_id   DESC");
@@ -233,10 +285,39 @@ public function getAllAppliedJobs($email){
   return $jobs;
 }
 
-
+public function statusUpdate($Email, $jobId,$Status){
+  $stmt = $this->con->prepare("UPDATE applied_jobs SET Status = ? WHERE Applied_By = ? AND Job_id=?");
+     
+  $stmt->bind_param("sss",$Status,$Email,$jobId );
+  if ($stmt->execute()) {
+    return true;
+} else {
+    return false;
+}
+}
 
 
 
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+

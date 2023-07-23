@@ -3,33 +3,30 @@
 require_once '../Data_operations/Job_Operation.php';
 $response = array(); 
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $jobId = $_POST['Job_id'];
+    $jobId = $_POST['jobID'];
     $Email = $_POST['email'];
-    $Name = $_POST['name'];
+    $Status= $_POST['status'];
      
-    if (!empty($jobId) && !empty($Email) && !empty($Name)) {
+    if (!empty($jobId) && !empty($Email) && !empty($Status)) {
         $job = new Job();
-        $result = $job->applyJob($Email, $jobId,$Name);
-       
+        $result = $job->statusUpdate($Email, $jobId,$Status);
         
         if ($result) {
             $response['error'] = false;
-            $response['message'] = "Applied Successfully";
+            $response['message'] = "Updated Status";
         } else {
             $response['error'] = true;
-            $response['message'] = "Error while Applying! Try Again";
+            $response['message'] = "Error while Updated Status ";
         }
     } else {
         $response['error'] = true;
-        $response['message'] = "ID or Email not found";
+        $response['message'] = "ID  Email not found";
     }
-
-  
 } else {
     $response['error'] = true;
     $response['message'] = "Invalid Request Method";
 }
 
 echo json_encode($response);
-

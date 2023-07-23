@@ -79,4 +79,44 @@ class Org{
 
 
     }
+
+    public function countUser($jId){
+        $stmt = $this->con->prepare("SELECT COUNT(*) AS total_rows FROM applied_jobs WHERE Job_id=?");
+        $stmt->bind_param("i", $jId);
+
+        $stmt->execute(); 
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        
+        if ($row) {
+            $totalRows = $row['total_rows'];
+        } else {
+            $totalRows = 0;
+        }
+        
+        return $totalRows;  
+    }
+
+    public function getDetails($jId){
+        $stmt = $this->con->prepare("SELECT Applied_By, Name,Job_id FROM applied_jobs WHERE Job_id = ?");
+        $stmt->bind_param("s", $jId);
+        if ($stmt->execute()){
+            $result = $stmt->get_result();
+           $details =array();
+           while ($row = $result->fetch_assoc()) {
+            $details[] = [
+                'Email' => $row['Applied_By'],
+                'Name' => $row['Name'],
+                'jobId'=>$row['Job_id']
+            ];
+        }
+        return $details;
+        var_dump($details); 
+        }
+        return false;
+
+
+    }
+    
+    
 }

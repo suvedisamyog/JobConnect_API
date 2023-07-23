@@ -104,11 +104,7 @@ class User{
  
     
     public function getCv($email){
-        $stmt = $this->con->prepare("SELECT cv.*, user_profile.*    FROM cv    JOIN user_profile ON cv.email = user_profile.uEmail   WHERE cv.email = ?");
-        if ($stmt === false) {
-            echo $this->con->error;
-            return null; // or handle the error appropriately
-        }
+        $stmt = $this->con->prepare("SELECT cv.*, user_profile.*    FROM cv    JOIN user_profile ON cv.email = user_profile.uEmail   WHERE cv.email = ?");    
         
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -130,6 +126,34 @@ class User{
         $result = $stmt->get_result();
         $row = $result->fetch_assoc();
         return !empty($row);
+    }
+    public function fetchUserInterest($email) {
+        $stmt = $this->con->prepare("SELECT  uCategories  FROM user_profile    WHERE uEmail = ?");            
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = array();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row['uCategories'];
+        }
+        $concatenatedCategories = implode(',', $data);
+
+        return $concatenatedCategories;
+
+    }
+    public function fetchUserApplied($email) {
+        $stmt = $this->con->prepare("SELECT job_category FROM applied_history WHERE user = ? ORDER BY countTimes DESC");            
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = array();
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row['job_category'];
+        }
+    
+        $concatenatedCategories = implode(',', $data);
+    
+        return $concatenatedCategories;
     }
     
     
